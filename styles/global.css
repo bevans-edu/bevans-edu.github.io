@@ -1,0 +1,130 @@
+
+#loc-img {
+    max-width: 90%;
+    border-radius: 2px;
+    outline: 1px white solid;
+    margin: 10px;
+    margin-left: 0px;
+}
+#overlay {
+    display: none;
+    position: fixed;
+    /* width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; */
+    align-self: center;
+    backdrop-filter: brightness(20%);
+    /* justify-self: center; */
+    margin-top: 10%;
+    flex-direction: column;
+    outline: 1px white solid;
+    backdrop-filter: blur(90px);
+    justify-content: center;
+    align-items: center;
+    /* padding: 3%; */
+    border-radius: 1px;
+    max-width: 75vw;
+    /* background-color: darkgray; */
+    padding: 1%;
+    z-index: 2;
+}
+
+#inventory-alert, #item-desc {
+    font-size: large;
+    margin: 0px;
+}
+#item-desc {
+    font-weight: bold;
+}
+
+#item-img {
+    margin-top: 5%;
+    display: inline;
+    width: 70%;
+}
+.game-window{
+    display: flex;
+    flex-direction: column;
+    padding: 0% 2% 0% 2%;
+    /* outline: 1px white solid; */
+    /* justify-content: center; */
+    /* align-items: center; */
+}
+/* .location {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+.item-btn {
+    background-color: darkslategray;
+}
+body {
+    margin: 0px;
+    background-color: black;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    /* max-width: 50vw; */
+    /* padding-left: 40%; */
+}
+button {
+    color: white;
+    background-color: black;
+    outline: 1px white solid;
+    font-family: inherit;
+    border-radius: 2px;
+    margin: 5px;
+    margin-left: 0px;
+    font-size: 16px;
+    padding: 12px;
+    font-weight: bold;
+}
+button:hover {
+    background-color: #252644;
+}
+h2 {
+    font-size: 12px;
+    /* margin-bottom: 12px; */
+    line-height: 12px;
+    /* padding: 0px; */
+}
+main h1 {
+    font-size: 40px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    line-height: 70px;
+}
+.loc-desc {
+    margin: 5px 0px 5px 0px;
+}
+@media all and (min-width: 1200px) {
+    .game-window{
+        /* align-items: center; */
+        max-width: 50%;
+        padding: 1% 5% 0% 5%;
+        font-size: 24px;
+        /* justify-content: center; */
+    }
+    main h1 {
+        font-size: 80px;
+    }
+    main h2 {
+        font-size: 20px;
+    }
+    #loc-img{
+        display: flex;
+        justify-content: center;
+        max-height: 40vh;
+    }
+    button {
+        padding: 8px;
+        font-size: 24px;
+    }
+    #overlay{
+    max-width: 20vw;
+
+    }
+}

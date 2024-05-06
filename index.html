@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="styles/global.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+        var currentPlace = "start"
+        var previousPlace = "start"
+        var places = ["vending-machine","dorms","bac","e1","dining-basement-hall","dining-hall","dining-basement","intersection","bacs","mpac","start","playground","slide","field","bats","candles","afh","anc","mpac-hall","mirror","stage","loft","lower-hall","ropes","e0","w1"];
+        var locHistory = []; // location history
+        var inventory = [];
+        function hideAll() { // hide all elements in var places
+            places.forEach(element => {
+                document.getElementById(element).style.display = "none";
+            });
+        }
+        function init() { // hideAll, reset history, visit starting page
+            hideAll();
+            showItems();
+            inventoryDisplay(false);
+            currentPlace = "start";
+            previousPlace = "start";
+            visit('start');
+            locHistory = [];
+            inventory = [];
+        }
+        function visit(destination,goingBack,requiredItem,useItem) { // hideAll, then show place from button
+            if ((requiredItem !== undefined) && (!(inventory.includes(requiredItem)))) { // if required item is passed into function and it's not in the inventory
+                inventoryAlert(requiredItem); // alert the player
+                return;
+            }
+            if (useItem == 1) { //if use item is passed as 1
+                use(requiredItem); //use the required item
+            }
+            hideOptionals();
+            hideAll();
+            previousPlace = currentPlace;
+            currentPlace = destination;
+            if (!goingBack) { // if not visiting from back button, add the last place to the location history
+                locHistory.push(previousPlace);
+            }
+            if (inventory.includes(document.getElementById(destination).getAttribute("data-optionalItem"))){
+                var optionals = document.querySelectorAll('[data-showItem]');
+                optionals.forEach(element => {
+                    if (inventory.includes(element.getAttribute("data-showItem"))){
+                        element.style.display = "inline";
+                    }
+                });
+            }
+            updateHistory();
+            updateInventory();
+            overlay(false); // hide the overlay
+            document.getElementById(destination).style.display = "block"; //show destination
+        }
+        function hideOptionals(){
+            var optionals = document.querySelectorAll('[data-showItem]');
+            optionals.forEach(element => {
+                element.style.display = "none";
+            });
+        }
+        function inventoryAlert(reqItem) {
+            showItemImg(false);
+            document.getElementById('inventory-alert').innerHTML = "You need this item to continue:";
+            document.getElementById('item-desc').innerHTML = reqItem;
+            overlay(true); // show overlay
+        }
+        function prev() {
+            visit(locHistory.pop(),1);
+        }
+        function updateHistory() {
+            var locationTitles = document.querySelectorAll(".location-previous");
+            locationTitles.forEach(element => {
+                element.innerHTML = "History: " + locHistory;
+            });
+        }
+        function updateInventory() {
+            var inventoryTitles = document.querySelectorAll(".inventory-display");
+            inventoryTitles.forEach(element => {
+                element.innerHTML = "Inventory: " + inventory;
+            });
+        }
+        function collect(item,title,requiredItem,useItem) {
+            if ((requiredItem !== undefined) && (!(inventory.includes(requiredItem)))) { // if required item is passed into function and it's not in the inventory
+                inventoryAlert(requiredItem); // alert the player
+                return;
+            }
+            if (useItem == 1) { //if use item is passed as 1
+                use(requiredItem); //use the required item
+            }
+            hideItem(item);
+            document.getElementById('inventory-alert').innerHTML = "You added an item to your inventory:";
+            showItemImg(true);
+            document.getElementById('item-desc').innerHTML = title;
+            document.getElementById('item-img').src = "img/items/"+item+".png";
+            overlay(true); // show overlay
+            inventory.push(item);
+            updateInventory();
+            inventoryDisplay(true);
+        }
+        function use(item) {
+            if (inventory.includes(item)){
+                var itemIndex = inventory.indexOf(item);
+                var tempInv = inventory.splice(itemIndex,1);
+            }
+        }
+        function showItemImg(state) {
+            if (state == true) {
+                document.getElementById('item-img').style.display = "inline";
+            }
+            if (state == false) {
+                document.getElementById('item-img').style.display = "none";
+            }
+        }
+        function showItems() {
+            var itemElements = document.querySelectorAll("[data-item]");
+            itemElements.forEach(element => {
+                element.style.display = "inline-block";
+            });
+        }
+        function hideItem(which) { // hide all elements with the relevant data tag
+            var itemElements = document.querySelectorAll("[data-item="+which+"]");
+            itemElements.forEach(element => {
+                element.style.display = "none";
+            });
+        }
+        function inventoryDisplay(state) {
+            if (state == true) {
+                var itemElements = document.querySelectorAll(".inventory-display");
+                itemElements.forEach(element => {
+                    element.style.display = "inline";
+                });
+            }
+            if (state == false) {
+                var itemElements = document.querySelectorAll(".inventory-display");
+                itemElements.forEach(element => {
+                    element.style.display = "none";
+                });
+            }
+        }
+        function overlay(state) {
+            if (state == true) {
+                document.getElementById('overlay').style.display = "flex";
+            }
+            if (state == false) {
+                document.getElementById('overlay').style.display = "none";
+            }
+        }
+        function accept() {
+            overlay(false);
+        }
+    </script>
+</head>
+<body onload="init()">
+    <main class="game-window">
+        <div id="overlay">
+            <p id="inventory-alert"></p>
+            <p id="item-desc"></p>
+            <img id="item-img" src="">
+            <button onclick="accept()">OK</button>
+        </div>
+        <div id="start" class="location">
+            <p class="loc-desc">Welcome to the adventure</p>
+            <button onclick="visit('bacs')">Begin</button>
+        </div>
+        <div id="bacs" class="location">
+            <h1 class="location-title">BACS</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You find yourself standing at the Bryn Athyn Elementary School.</p>
+            <p class="loc-desc">No one is here.</p>
+            <img id="loc-img" src="img/bacs.jpg">
+            <!-- <button class="prev-btn" onclick="prev()">Go back</button> -->
+            <button onclick="visit('playground')">Playground</button>
+            <button onclick="visit('bats')">BATS</button>
+            <button onclick="visit('intersection')">Along the road</button>
+        </div>
+
+        <div id="intersection" class="location">
+            <h1 class="location-title">Intersection</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">The intersection between Buck and Tomlinson road. There are no cars.</p>
+            <img id="loc-img" src="img/intersection.jpg">
+            <!-- <button class="prev-btn" onclick="prev()">Go back</button> -->
+            <button onclick="visit('bacs')">BACS</button>
+            <button onclick="visit('anc')">High school</button>
+            <button onclick="visit('bac')">College</button>
+        </div>
+        <div id="bats" class="location">
+            <h1 class="location-title">BATS</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">There was once an old thrift store here. Now only the ruins remain.</p>
+            <img id="loc-img" src="img/bats.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('candles')">Climb down</button>
+        </div>
+        <div id="candles" class="location">
+            <h1 class="location-title">BATS</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You climb down into the ruins. On the ground, electric candles flicker.</p>
+            <p class="loc-desc" data-item="dollar">There's a crumpled $1 bill in the rubble.</p>
+            <img id="loc-img" src="img/candles.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="collect('dollar','$1 bill')" data-item="dollar" class="item-btn">Collect dollar</button>
+        </div>
+        <div id="mpac" class="location">
+            <h1 class="location-title">MPAC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">There's a door on the side of the building.</p>
+            <img id="loc-img" src="img/mpac.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('mpac-hall')">Enter the door</button>
+        </div>
+        <div id="mpac-hall" class="location">
+            <h1 class="location-title">MPAC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">One light is on. There's a mirror on the wall.</p>
+            <p class="loc-desc">You don't hear anything.</p>
+            <img id="loc-img" src="img/mpac-hall.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('stage')">Go to the stage</button>
+            <button onclick="visit('mirror')">Look in the mirror</button>
+            <button onclick="visit('lower-hall')">Go downstairs</button>
+        </div>
+        <div id="lower-hall" class="location">
+            <h1 class="location-title">MPAC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">The hall is filled with old props. There's an access door to the fly operating system.</p>
+            <p class="loc-desc">No one is here.</p>
+            <img id="loc-img" src="img/lower-hall.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('ropes')">Fly system</button>
+        </div>
+        <div id="ropes" class="location" data-optionalItem="oreos">
+            <h1 class="location-title">Fly system</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">A row of fly lines extends past the light.</p>
+            <p class="loc-desc">You can hear something moving.</p>
+            <p class="loc-desc">Someone is here.</p>
+            <img id="loc-img" src="img/ropes.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('e0')">Go further</button>
+            <button onclick="visit('w1')" data-showItem="oreos">Offer oreos</button>
+
+        </div>
+        <div id="w1" class="location">
+            <p class="loc-desc">They are subdued by your offering.</p>
+            <p class="loc-desc">You win!</p>
+            <button onclick="init()">Begin again</button>
+        </div>
+        <div id="mirror" class="location">
+            <h1 class="location-title">MPAC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc"></p>
+            <img id="loc-img" src="img/mirror.jpg">
+            <button onclick="visit('stage')">Go to the stage</button>
+            <button class="prev-btn" onclick="prev()">Go back</button>
+        </div>
+        <div id="stage" class="location">
+            <h1 class="location-title">MPAC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You face where there once were audiences.</p>
+            <p class="loc-desc">No one is here.</p>
+            <img id="loc-img" src="img/stage.jpg">
+            <button onclick="visit('anc')">Exit</button>
+            <button onclick="visit('loft')">Fly loft</button>
+            <button class="prev-btn" onclick="prev()">Go back</button>
+        </div>
+        <div id="loft" class="location">
+            <h1 class="location-title">Fly loft</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You climb the stairs to the loft.</p>
+            <p class="loc-desc">You can hear a noise from down at the bottom of the ropes, in the basement.</p>
+            <p class="loc-desc">No one is here.</p>
+            <img id="loc-img" src="img/loft.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+        </div>
+        <div id="playground" class="location">
+            <h1 class="location-title">Playground</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You find yourself at the playground. The swings sway in the wind.</p>
+            <img id="loc-img" src="img/playground.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('bacs')">BACS</button>
+            <button onclick="visit('slide')">Climb the slide</button>
+            <button onclick="visit('field')">Fields</button>
+        </div>
+        <div id="slide" class="location">
+            <h1 class="location-title">Slide</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You climb the slide to the top. You have a great view.</p>
+            <p class="loc-desc">You see no one.</p>
+            <img id="loc-img" src="img/slide.jpg">
+            <button class="prev-btn" onclick="prev()">Slide down</button>
+        </div>
+        <div id="field" class="location">
+            <h1 class="location-title">Field</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You walk to the athletic fields. The unused scoreboard illuminates the ground.</p>
+            <img id="loc-img" src="img/field.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('playground')">Playground</button>
+            <button onclick="visit('afh')">Parking lot</button>
+        </div>
+        <div id="afh" class="location">
+            <h1 class="location-title">Parking lot</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You find yourself at the field house parking lot. The only light comes from the streetlight in the center.</p>
+            <p class="loc-desc" data-item="id">On the ground, you see an ID card.</p>
+            <img id="loc-img" src="img/afh.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('field')">Fields</button>
+            <button onclick="visit('anc')">High school</button>
+            <button onclick="collect('id','ID Card')" data-item="id" class="item-btn">Collect ID card</button>
+        </div>
+        <div id="anc" class="location">
+            <h1 class="location-title">ANC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You're at the high school. The night air is cool and calm.</p>
+            <p class="loc-desc">The buildings appear empty.</p>
+            <img id="loc-img" src="img/anc.jpg">
+            <!-- <button class="prev-btn" onclick="prev()">Go back</button> -->
+            <button onclick="visit('intersection')">Down the road</button>
+            <button onclick="visit('mpac')">MPAC</button>
+            <button onclick="visit('dining-hall')">Dining Hall</button>
+            <button onclick="visit('afh')">Field House</button>
+
+        </div>
+        <div id="dining-hall" class="location">
+            <h1 class="location-title">ANC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You walk to the dining hall. On the lower level, there's an access door</p>
+            <p class="loc-desc">You can't see what's inside.</p>
+            <img id="loc-img" src="img/dining-hall.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('dining-basement',0,'id',1);">Enter the door</button>
+        </div>
+        <div id="dining-basement" class="location">
+            <h1 class="location-title">ANC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You scan your ID and the door unlocks. You walk in.</p>
+            <p class="loc-desc">There's an unlit hallway to the left.</p>
+            <p class="loc-desc">No one is here.</p>
+            <img id="loc-img" src="img/dining-basement.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('dining-basement-hall')">Hallway</button>
+        </div>
+        <div id="dining-basement-hall" class="location">
+            <h1 class="location-title">ANC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">The hallway continues into the darkness.</p>
+            <p class="loc-desc">You hear a noise.</p>
+            <p class="loc-desc">This is where it had made its home.</p>
+            <img id="loc-img" src="img/dining-basement-hall.jpg">
+            <button class="prev-btn">Go back</button>
+            <button onclick="visit('e1')">Down the hall</button>
+        </div>
+        <div id="bac" class="location">
+            <h1 class="location-title">BAC</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You walk to the college campus.</p>
+            <p class="loc-desc">There's no one here.</p>
+            <img id="loc-img" src="img/bac.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('dorms')">Dorms</button>
+            <!-- <button onclick="visit('glencairn')">Glencairn</button> -->
+            <!-- <button onclick="visit('cathedral')">Cathedral</button> -->
+        </div>
+        <div id="dorms" class="location">
+            <h1 class="location-title">Dorms</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">You stand in the center of the dormitories.</p>
+            <p class="loc-desc">There's a vending machine down on the left.</p>
+            <img id="loc-img" src="img/dorms.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="visit('vending-machine')">Vending machine</button>
+        </div>
+        <div id="vending-machine" class="location">
+            <h1 class="location-title">Vending Machine</h1>
+            <h2 class="location-previous">null!</h2>
+            <h2 class="inventory-display">null!</h2>
+            <p class="loc-desc">The vending machine has various snacks.</p>
+            <img id="loc-img" src="img/vending-machine.jpg">
+            <button class="prev-btn" onclick="prev()">Go back</button>
+            <button onclick="collect('oreos','Oreo Cookies','dollar',1)">Buy a snack</button>
+        </div>
+        
+        <div id="e0" class="location">
+            <h1 class="location-title"></h1>
+            <p class="loc-desc">You follow the noise into the ropes.</p>
+            <p class="loc-desc">You join them.</p>
+            <button onclick="init()">Begin again</button>
+        </div>
+        <div id="e1" class="location">
+            <h1 class="location-title"></h1>
+            <p class="loc-desc">You follow the noise down the hall.</p>
+            <p class="loc-desc">You are not welcome here.</p>
+            <button onclick="init()">Begin again</button>
+        </div>
+    </main>
+</body>
+</html>
